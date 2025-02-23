@@ -1,0 +1,55 @@
+diff --git a/core/rtl/verilog/crypto/crypto_control.v b/core/rtl/verilog/crypto/crypto_control.v
+index 81287a9..2323682 100644
+--- a/core/rtl/verilog/crypto/crypto_control.v
++++ b/core/rtl/verilog/crypto/crypto_control.v
+@@ -62,7 +62,7 @@ function [15:0] swap_bytes;
+ endfunction
+ 
+ // state machine ***************************************************************
+-localparam STATE_SIZE = 6;
++localparam STATE_SIZE = 7;
+ localparam [STATE_SIZE-1:0] IDLE              =  0,
+                             ENABLE_SM         = 54,
+                             CHECK_SM          =  1,
+@@ -126,6 +126,8 @@ localparam [STATE_SIZE-1:0] IDLE              =  0,
+                             IRQ_FAIL          = 62,
+                             SUCCESS           = 50,
+                             WAIT              = 61,
++                            VERIFY_TAG_F      = 63,
++                            VERIFY_TAG_WAIT_F = 64,
+                             INTERNAL_ERROR    = {STATE_SIZE{1'bx}};
+ 
+ reg [STATE_SIZE-1:0] state, next_state;
+@@ -169,9 +171,12 @@ always @(*)
+         WRITE_TAG:         next_state =               WRITE_TAG_WAIT;
+         WRITE_TAG_WAIT:    next_state = wrap_busy   ? WRITE_TAG_WAIT    :
+                                         mem_done    ? SUCCESS           : WRITE_TAG;
+-        VERIFY_TAG:        next_state = tag_ok      ? VERIFY_TAG_WAIT   : FAIL;
++        VERIFY_TAG:        next_state = tag_ok      ? VERIFY_TAG_WAIT   : VERIFY_TAG_WAIT_F;
+         VERIFY_TAG_WAIT:   next_state = mem_done    ? SUCCESS           :
+                                         wrap_busy   ? VERIFY_TAG_WAIT   : VERIFY_TAG;
++        VERIFY_TAG_F:      next_state = VERIFY_TAG_WAIT_F;
++        VERIFY_TAG_WAIT_F: next_state = mem_done    ? FAIL              :
++                                        wrap_busy   ? VERIFY_TAG_WAIT_F : VERIFY_TAG_F;
+         GEN_VKEY_INIT:     next_state =               WRAP_VID;
+         WRAP_VID:          next_state =               WRAP_VID_WAIT;
+         WRAP_VID_WAIT:     next_state = wrap_busy   ? WRAP_VID_WAIT     : WRITE_VKEY_INIT;
+@@ -401,6 +406,18 @@ begin
+             mab_ctr_inc = wrap_data_out_ready;
+         end
+ 
++        VERIFY_TAG_F:
++        begin
++            set_wrap_start_continue = 1;
++            mb_en = 1;
++        end
++
++        VERIFY_TAG_WAIT_F:
++        begin
++            mb_en = 1;
++            mab_ctr_inc = wrap_data_out_ready;
++        end
++
+         GEN_VKEY_INIT:
+         begin
+             update_key_select = 1;
