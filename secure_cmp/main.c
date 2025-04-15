@@ -35,6 +35,10 @@ int main()
     uint8_t arr[5] = {0x05, 0x65, 0xe8, 0x3c, 0xab};
     uint8_t arr2[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
     int res;
+    timer_tsc_start();
+    res = secure_memcmp(arr, arr2, 5);
+    tsc2 = timer_tsc_end();
+    pr_info3("comparison (%d/5 bytes correct) with result: %d, took %d cycles\n", 0, res, tsc2-tsc1);
 
     for ( int i = 0; i < 5; i++ )
     {
@@ -45,8 +49,8 @@ int main()
             res = secure_memcmp(arr, arr2, 5);
             tsc2 = timer_tsc_end();
             if( tsc2 - tsc1 >= 57 + (i+1)*19 || (i == 4 && tsc2 - tsc1  == 138 )){
-                pr_info2("cmp with result: %d, took %d cycles\n", res, tsc2-tsc1);
-                break;
+              pr_info3("comparison (%d/5 bytes correct) with result: %d, took %d cycles\n", i+1, res, tsc2-tsc1);
+              break;
             }
         }
     }
