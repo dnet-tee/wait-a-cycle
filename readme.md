@@ -1,31 +1,45 @@
 # Wait a Cycle
 
-Artifacts for the Wait a Cycle paper submitted to 8th Workshop on System Software for Trusted Execution.
+This repository contains the artifacts accompanying our [paper](https://downloads.distrinet-research.be/software/sancus/research.php#sca) "Wait a Cycle: Eroding Cryptographic Trust in Low-End TEEs via Timing Side Channels" to appear at the 8th Workshop on System Software for Trusted Execution.
+<!-- More information on the paper and links to other investigated systems can be
+found in the top-level [gap-attacks](https://github.com/martonbognar/gap-attacks) repository. -->
 
-## Standard Library Functions
+> R. Van Dijck, M. Bognar, and J. Van Bulck, "Wait a Cycle: Eroding Cryptographic Trust in Low-End TEEs via Timing Side Channels," in 2025 IEEE 8th Workshop on System Software for Trusted Execution (SysTEX).
 
-- C++ authenticated encryption with associated data in Sancus: https://github.com/sancus-tee/sancus-compiler/blob/master/src/crypto/spongent.cpp.
-- VatiCAN code is offline now, a zipped folder can be found here.
-- The vulnerable VRASED function and an attack can be found in the secure_cmp folder. In addition, the following links bring you to vulnerable derivatives of VRASED:
-  - https://github.com/sprout-uci/RATA/blob/d5ae4313ccb400b134e98edcf704a1f03317a183/vrased/sw-att/wrapper.c#L47
-  - https://github.com/sprout-uci/vrased-plus/blob/6bd2537cc2fe88b0b5c89925d76bbf5a5eb2010a/vrased/sw-att/wrapper.c#L48
-  - https://github.com/RIT-CHAOS-SEC/ACFA/blob/dcd92aa9c1fa990cd14b12eff6fe6770de290d15/tcb/wrapper.c#L344
-  - https://github.com/sprout-uci/TRAIN/blob/d3fef51620b3421d58b55d547e48a96059d080f8/TRAINRATA/train/sw-att/wrapper.c#L507
+Artifacts and relevant to the findings in the paper can be found in this repository. For more information about mitigations we suggest to look at the issues submitted to the affected repositories.
 
-## Compiler Analysis
+## Overview
 
-- The code used for analysing compilers: c_code_compare_full.c, c_train.c, cmp_msp430gcc_14.2.0.s, cmp_sancus-cc.s and train_msp430gcc_14.2.0.s.
-- In addition, you can find the vulnerable LeiA code here: https://github.com/MoatazFarid/Lightweight-Authentication-Protocol-for-CAN-LeiA/blob/bb4c47ac6c56a0ee448eeb5639e65dc012c7f332/LeiA.c#L490.
-- The VulCAN code is vulnerable in two different places:
-  - https://github.com/sancus-tee/vulcan/blob/427a9698ef446162e4ab7a23968316596bbc26a9/can-auth/leia.c#L346 and
-  - https://github.com/sancus-tee/vulcan/blob/427a9698ef446162e4ab7a23968316596bbc26a9/can-auth/vatican.c#L241.
+### Standard Library Functions
 
 
-## Hardware Timing Vulnerability
+| Description | Proof-of-concept attack | Issue |
+|-----------------|---------------|:-------------:|
+| C++ authenticated encryption with associated data in Sancus | / | / |
+| VatiCAN code is offline now, a zipped folder can be found here. | / | / |
+| The vulnerable VRASED function and an attack can be found in the secure_cmp folder. | [secure_memcmp](secure_memcmp/) | [VRASED+](https://github.com/sprout-uci/vrased-plus/issues/1), [TRAIN](https://github.com/sprout-uci/TRAIN/issues/1), [ACFA](https://github.com/RIT-CHAOS-SEC/ACFA/issues/1), [RATA](https://github.com/sprout-uci/RATA/issues/1), and [SpecCFA](https://github.com/RIT-CHAOS-SEC/SpecCFA/issues/1) |
 
-- The attack on the unwrap primitive of Sancus can be found in folder unwrap-break.
-- The end-to-end attack on the authentic execution framework can be found in folder auth-ex-break.
 
-## Hardware Mitigation
+### Compiler Analysis
 
-Two patches for the vulnerable Sancus core are provided in the mitigations folder. Changes are in comparison to the latest [commit](https://github.com/sancus-tee/sancus-core/blob/d83a5207dc5b079847dba39ac17e98fcb4bc088f).
+| Description | Proof-of-concept attack | Issue |
+|-----------------|---------------|:-------------:|
+| The code used for analysing compilers can be found in the compiler-equal folder. To ease the artifact evaluation you can use Godbolt for different compilers e.g.: [MSP430 gcc 14.2.0](https://godbolt.org/z/b63qf4T76) or [RISC-V gcc 14.2.0](https://godbolt.org/z/oqvhKPh7M). | [compiler-equal](compiler-equal/) | / |
+| Vulnerable LeiA code. | / | [LeiA](https://github.com/MoatazFarid/Lightweight-Authentication-Protocol-for-CAN-LeiA/issues/1) |
+| VulCAN is vulnerable in two places. | / | [VulCAN](https://github.com/sancus-tee/vulcan/issues/9) |
+
+### Hardware Timing Vulnerability
+
+| Description | Proof-of-concept attack | Issue |
+|-----------------|---------------|:-------------:|
+| Sancus' cryptographic unit is vulnerable. | [unwrap-break](unwrap-break/) | [Sancus](https://github.com/sancus-tee/sancus-core/issues/34) |
+| An end-to-end attack on the Authentic Execution framework is performed.  | [auth-ex-break](auth-ex-break/) | / |
+
+### Hardware Mitigation
+
+Two patches for the vulnerable Sancus core are provided in the [mitigations](mitigations/) folder. Changes are in comparison to the latest [commit](https://github.com/sancus-tee/sancus-core/blob/d83a5207dc5b079847dba39ac17e98fcb4bc088f).
+
+
+## Installation
+
+The general installation instructions of Sancus can be found [here](https://github.com/sancus-tee/sancus-main).

@@ -20,7 +20,7 @@ secure_memcmp:
 	jmp	.LBB0_8             ; 0         | 0         | 1
 .LBB0_5:
     mov.w	#-1, r9         ; n         | n + 1     | 0
-	cmp.b	r11, r10        ; n         | n + 1     | 0
+	cmp.br	r11, r10        ; n         | n + 1     | 0
 	jlo	.LBB0_7             ; n         | n + 1     | 0
 	mov.w	r12, r9         ; 0         | 1         | 0
 .LBB0_7:
