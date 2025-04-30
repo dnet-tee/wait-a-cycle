@@ -51,7 +51,8 @@ The general installation instructions of Sancus can be found [here](https://gith
 | Sancus compiler | [GPLv3](https://github.com/sancus-tee/sancus-compiler/blob/master/README.md?plain=1) |
 | Sancus core | [BSD](https://github.com/sancus-tee/sancus-core/blob/master/LICENSE) |
 | VulCAN | [GPLv3](https://github.com/sancus-tee/vulcan/blob/master/README.md?plain=1) |
-| vatiCAN | Free to use for non-commercial purposes |
+| vatiCAN | Free to use for non-commercial purposes, see [vatican-1.1.zip](vatican-1.1.zip) |
 | VRASED | [GPLv3](https://github.com/sprout-uci/vrased/blob/master/LICENSE) |
 | RATA | [GPLv3](https://github.com/sprout-uci/RATA/blob/main/LICENSE) |
 | TRAIN | [GPLv3](https://github.com/sprout-uci/TRAIN/blob/main/TRAINCASU/LICENSE) |
+| Authentic Execution framework | [MIT](https://github.com/AuthenticExecution/.github/blob/master/LICENSE) |
