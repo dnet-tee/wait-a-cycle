@@ -13,16 +13,16 @@ Artifacts and repositories relevant to the findings in the paper can be found he
 
 | Description | Proof-of-concept attack | Issue |
 |-----------------|---------------|:-------------:|
-| C++ authenticated encryption with associated data in Sancus. | / | / |
-| VatiCAN code is offline now, a zipped folder can be found here. | / | / |
-| The vulnerable VRASED function and an attack can be found in the secure_cmp folder. | [secure_memcmp](secure_memcmp/) | [VRASED+](https://github.com/sprout-uci/vrased-plus/issues/1), [TRAIN](https://github.com/sprout-uci/TRAIN/issues/1), [ACFA](https://github.com/RIT-CHAOS-SEC/ACFA/issues/1), [RATA](https://github.com/sprout-uci/RATA/issues/1), and [SpecCFA](https://github.com/RIT-CHAOS-SEC/SpecCFA/issues/1) |
+| C++ authenticated encryption with associated data in Sancus. | / | [sancus-compiler](https://github.com/sancus-tee/sancus-compiler/issues/42), [authentic execution](https://github.com/AuthenticExecution/spongent-cpp-rs/issues/1) |
+| VatiCAN code is offline now, a zipped folder can be found here. | / | see /vatican-1.1/vatican/src/vatican.cpp#L.169 |
+| The vulnerable VRASED function and an attack can be found in the secure_cmp folder. The results of this attack (Wait a Cycle: table 5) can be reproduced using the proof-of-concept attack. | [secure_memcmp](secure_memcmp/) | [VRASED+](https://github.com/sprout-uci/vrased-plus/issues/1), [TRAIN](https://github.com/sprout-uci/TRAIN/issues/1), [ACFA](https://github.com/RIT-CHAOS-SEC/ACFA/issues/1), [RATA](https://github.com/sprout-uci/RATA/issues/1), and [SpecCFA](https://github.com/RIT-CHAOS-SEC/SpecCFA/issues/1) |
 
 
 ### Compiler Analysis (Section §3.2)
 
 | Description | Proof-of-concept | Issue |
 |-----------------|---------------|:-------------:|
-| The code used for analysing compilers can be found in the compiler-equal folder. To ease the artifact evaluation you can use Godbolt for different compilers e.g.: [MSP430 gcc 14.2.0](https://godbolt.org/z/b63qf4T76) or [RISC-V gcc 14.2.0](https://godbolt.org/z/oqvhKPh7M). | [compiler-equal](compiler-equal/) | / |
+| The code used for analysing compilers can be found in the compiler-equal folder. To ease the artifact evaluation you can use Godbolt for different compilers (Wait a Cycle: listing 2, listing 3 and table 2): [MSP430 gcc 14.2.0](https://godbolt.org/z/b63qf4T76), [RISC-V gcc 14.2.0](https://godbolt.org/z/oqvhKPh7M), [MIPS (el) gcc 14.2.0](https://godbolt.org/z/7ffT77oMf) and [x86 msvc v19](https://godbolt.org/z/fYY8Phx9z). | [compiler-equal](compiler-equal/) | / |
 | Vulnerable LeiA code. | / | [LeiA](https://github.com/MoatazFarid/Lightweight-Authentication-Protocol-for-CAN-LeiA/issues/1) |
 | VulCAN is vulnerable in two places. | / | [VulCAN](https://github.com/sancus-tee/vulcan/issues/9) |
 
@@ -30,12 +30,12 @@ Artifacts and repositories relevant to the findings in the paper can be found he
 
 | Description | Proof-of-concept attack | Issue |
 |-----------------|---------------|:-------------:|
-| Sancus' cryptographic unit is vulnerable. | [unwrap-break](unwrap-break/) | [Sancus](https://github.com/sancus-tee/sancus-core/issues/34) |
+| Sancus' cryptographic unit is vulnerable (Wait a Cycle: figure 1 and table 3). | [unwrap-break](unwrap-break/) | [Sancus](https://github.com/sancus-tee/sancus-core/issues/34) |
 | An end-to-end attack on the Authentic Execution framework is performed.  | [auth-ex-break](auth-ex-break/) | / |
 
 ### Hardware Mitigation (Section §4.3)
 
-Two patches for the vulnerable Sancus core are provided in the [mitigations](mitigations/) folder. Changes are in comparison to the latest [commit](https://github.com/sancus-tee/sancus-core/blob/d83a5207dc5b079847dba39ac17e98fcb4bc088f).
+Two patches for the vulnerable Sancus core are provided in the [mitigations](mitigations/) folder. Changes are in comparison to the latest [commit](https://github.com/sancus-tee/sancus-core/blob/d83a5207dc5b079847dba39ac17e98fcb4bc088f). See section 4.3 in the paper for a full overview of the comparison and figure 2 and 3 for a graphical representation.
 
 
 ## Building and Running
