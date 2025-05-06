@@ -79,14 +79,14 @@ int main()
     dump_buf((uint8_t*)cipher.cipher, SANCUS_KEY_SIZE, "  Copy correct cipher");
 
 
-    for( int i = 0; i < SANCUS_KEY_SIZE/2; i++ ){
+    for( int i = 0; i < SANCUS_TAG_SIZE/2; i++ ){
         cipher.tag[2*i] = correct_tag[2*i];
         cipher.tag[2*i+1] = correct_tag[2*i+1];
         
         timer_tsc_start();
         super_secure_ecall(no, &cipher);
         tsc2 = timer_tsc_end();
-        printf("Time to verify if only %d/%d words correct: %u, tsc overhead: %u\n", i+1, SANCUS_KEY_SIZE, tsc2, tsc1);
+        printf("Time to verify if only %d/%d words correct: %u, tsc overhead: %u\n", i+1, SANCUS_TAG_SIZE/2, tsc2, tsc1);
     }
     // ======== WITHOUT INFO ==========
 

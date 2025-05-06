@@ -11,7 +11,7 @@ READER_SM_KEY   = `$(SANCUS_CRYPTO) --gen-sm-key reader --key $(VENDOR_KEY) main
 all: $(TARGET)
 
 $(TARGET_NO_MAC): $(OBJECTS)
-	$(LD) $(LDFLAGS) -o $@ $^
+	$(LD) $(LDFLAGS) --sm-config-file sm-config.yaml -o $@ $^
 
 $(TARGET): $(TARGET_NO_MAC)
 	$(SANCUS_CRYPTO) --fill-macs $(CRYPTOFLAGS) -o $@ $<

