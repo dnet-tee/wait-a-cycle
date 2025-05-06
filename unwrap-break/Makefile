@@ -1,4 +1,4 @@
-include Makefile.include
+include ../Makefile.include
 
 SOURCES         = $(shell ls *.c)
 OBJECTS         = $(SOURCES:.c=.o)

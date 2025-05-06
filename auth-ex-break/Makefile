@@ -1,4 +1,4 @@
-include Makefile.include
+include ../Makefile.include
 
 SOURCES         = $(shell ls *.c)
 OBJECTS         = $(SOURCES:.c=.o)
@@ -11,7 +11,7 @@ READER_SM_KEY   = `$(SANCUS_CRYPTO) --gen-sm-key reader --key $(VENDOR_KEY) main
 all: $(TARGET)
 
 $(TARGET_NO_MAC): $(OBJECTS)
-	$(LD) $(LDFLAGS) --sm-config-file sm-config.yaml -o $@ $^
+	$(LD) $(LDFLAGS) -o $@ $^
 
 $(TARGET): $(TARGET_NO_MAC)
 	$(SANCUS_CRYPTO) --fill-macs $(CRYPTOFLAGS) -o $@ $<

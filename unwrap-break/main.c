@@ -61,27 +61,32 @@ int main()
     CipherData correct_cipher = { 0 };
     hello_wrap(&data, no, &correct_cipher);
     char* correct_tag = correct_cipher.tag;
-    dump_buf((uint8_t*)correct_tag, 16, "  Correct tag");
-    dump_buf((uint8_t*)correct_cipher.cipher, 8, "  Correct cipher");
+    dump_buf((uint8_t*)correct_tag, SANCUS_TAG_SIZE, "  Correct tag");
+    dump_buf((uint8_t*)correct_cipher.cipher, SANCUS_KEY_SIZE, "  Correct cipher");
     
     CipherData cipher = { .cipher = *correct_cipher.cipher,
-                        .tag = "\xe7\x1c\x2f\x8e\x29\xba\x6f\xfc\xd0\x36\x94\x83\xb2\x77\xb2\x9c" };
+                           #if SANCUS_KEY_SIZE == 8
+                                .tag = "\xe7\x1c\x2f\x8e\x29\xba\x6f\xfc"
+                           #else
+                                .tag = "\xe7\x1c\x2f\x8e\x29\xba\x6f\xfc\xd0\x36\x94\x83\xb2\x77\xb2\x9c"
+                           #endif
+                        };
 
     for( int i = 0; i < 8; i++ ){
         cipher.cipher[i] = correct_cipher.cipher[i];
     }
 
-    dump_buf((uint8_t*)cipher.cipher, 8, "  Copy correct cipher");
+    dump_buf((uint8_t*)cipher.cipher, SANCUS_KEY_SIZE, "  Copy correct cipher");
 
 
-    for( int i = 0; i < 8; i++ ){
+    for( int i = 0; i < SANCUS_KEY_SIZE/2; i++ ){
         cipher.tag[2*i] = correct_tag[2*i];
         cipher.tag[2*i+1] = correct_tag[2*i+1];
         
         timer_tsc_start();
         super_secure_ecall(no, &cipher);
         tsc2 = timer_tsc_end();
-        pr_info3("Time to verify if only %d/8 bytes correct: %u, tsc overhead: %u\n", i+1, tsc2, tsc1);
+        printf("Time to verify if only %d/%d words correct: %u, tsc overhead: %u\n", i+1, SANCUS_KEY_SIZE, tsc2, tsc1);
     }
     // ======== WITHOUT INFO ==========
 

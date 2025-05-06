@@ -22,7 +22,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       matrix:
-        target: [secure_memcmp] # unwrap-break, auth-ex-break, compiler-equal ]
+        target: [secure_memcmp, unwrap-break, auth-ex-break, compiler-equal ]
 
     steps:
       - uses: actions/checkout@v2
