@@ -1,4 +1,5 @@
-# Wait a Cycle
+# Wait a Cycle: Eroding Cryptographic Trust in Low-End TEEs via Timing Side Channels
+[![Build Status](https://github.com/dnet-tee/wait-a-cycle/actions/workflows/ci.yml/badge.svg)](https://github.com/dnet-tee/wait-a-cycle/actions/workflows/ci.yml)
 
 This repository contains the artifacts accompanying our [paper](https://downloads.distrinet-research.be/software/sancus/publications/vandijck25wait.pdf) "Wait a Cycle: Eroding Cryptographic Trust in Low-End TEEs via Timing Side Channels" to appear at the 8th Workshop on System Software for Trusted Execution.
 
@@ -40,7 +41,9 @@ Two patches for the vulnerable Sancus core are provided in the [mitigations](mit
 
 ## Building and Running
 
-The example programs can be ran in the cycle-accurate Sancus openMSP430 simulator in a Docker environment as follows:
+The expected output can be viewed in the [GitHub Actions CI environment](https://github.com/dnet-tee/wait-a-cycle/actions).
+
+To run the proof-of-concepts yourself in the cycle-accurate Sancus openMSP430 simulator in a Docker environment, proceed as follows:
 
 ```bash
 $ docker pull ghcr.io/sancus-tee/sancus-main/sancus-devel-64:latest
