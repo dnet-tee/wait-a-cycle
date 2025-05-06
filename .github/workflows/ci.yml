@@ -27,5 +27,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         name: Pull repository
-      - run: cd ${{ matrix.target }} && make clean sim
+      - run: cd ${{ matrix.target }} ; make clean sim | tee sim.out ; ! grep -iqE "fail|error:" sim.out
         name: Build and run ${{ matrix.target }}
