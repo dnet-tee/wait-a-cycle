@@ -64,18 +64,19 @@ int main()
     dump_buf((uint8_t*)correct_tag, SANCUS_TAG_SIZE, "  Correct tag");
     dump_buf((uint8_t*)correct_cipher.cipher, SANCUS_KEY_SIZE, "  Correct cipher");
     
-    CipherData cipher = { .cipher = *correct_cipher.cipher,
+    // Fill the cipher with incorrect arbitrary data
+    CipherData cipher = { .cipher = "\x00\x00\x00\x00\x00\x00\x00\x00",
                            #if SANCUS_KEY_SIZE == 8
-                                .tag = "\xe7\x1c\x2f\x8e\x29\xba\x6f\xfc"
+                                .tag = "\x00\x00\x00\x00\x00\x00\x00\x00"
                            #else
-                                .tag = "\xe7\x1c\x2f\x8e\x29\xba\x6f\xfc\xd0\x36\x94\x83\xb2\x77\xb2\x9c"
+                                .tag = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
                            #endif
                         };
 
+    // Put the correct cipher in the first 8 bytes
     for( int i = 0; i < 8; i++ ){
         cipher.cipher[i] = correct_cipher.cipher[i];
     }
-
     dump_buf((uint8_t*)cipher.cipher, SANCUS_KEY_SIZE, "  Copy correct cipher");
 
 

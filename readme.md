@@ -1,5 +1,5 @@
 # Wait a Cycle: Eroding Cryptographic Trust in Low-End TEEs via Timing Side Channels
-[![Build Status](https://github.com/dnet-tee/wait-a-cycle/actions/workflows/ci.yml/badge.svg)](https://github.com/dnet-tee/wait-a-cycle/actions/workflows/ci.yml)
+[![Build Status](https://github.com/dnet-tee/wait-a-cycle/actions/workflows/ci.yml/badge.svg)](https://github.com/dnet-tee/wait-a-cycle/actions/workflows/ci.yml) [![Badge Available](https://systex-workshop.github.io/2025/img/systexbadges-available.svg)](https://systex-workshop.github.io/2025/artifact.html) [![Badge Functional](https://systex-workshop.github.io/2025/img/systexbadges-functional.svg)](https://systex-workshop.github.io/2025/artifact.html) [![Badge Reusable](https://systex-workshop.github.io/2025/img/systexbadges-reusable.svg)](https://systex-workshop.github.io/2025/artifact.html) 
 
 This repository contains the artifacts accompanying our [paper](https://downloads.distrinet-research.be/software/sancus/publications/vandijck25wait.pdf) "Wait a Cycle: Eroding Cryptographic Trust in Low-End TEEs via Timing Side Channels" to appear at the 8th Workshop on System Software for Trusted Execution.
 
@@ -16,7 +16,7 @@ Artifacts and repositories relevant to the findings in the paper can be found he
 |-----------------|---------------|:-------------:|
 | C++ authenticated encryption with associated data in Sancus. | / | [sancus-compiler](https://github.com/sancus-tee/sancus-compiler/issues/42), [authentic execution](https://github.com/AuthenticExecution/spongent-cpp-rs/issues/1) |
 | VatiCAN code is offline now, a zipped folder can be found here. | / | see /vatican-1.1/vatican/src/vatican.cpp#L.169 |
-| The vulnerable VRASED function and an attack can be found in the secure_cmp folder. The results of this attack (Wait a Cycle: table 5) can be reproduced using the proof-of-concept attack. | [secure_memcmp](secure_memcmp/) | [VRASED+](https://github.com/sprout-uci/vrased-plus/issues/1), [TRAIN](https://github.com/sprout-uci/TRAIN/issues/1), [ACFA](https://github.com/RIT-CHAOS-SEC/ACFA/issues/1), [RATA](https://github.com/sprout-uci/RATA/issues/1), and [SpecCFA](https://github.com/RIT-CHAOS-SEC/SpecCFA/issues/1) |
+| The vulnerable VRASED function and an attack can be found in the secure_memcmp folder. The results of this attack (Wait a Cycle: table 5) can be reproduced using the proof-of-concept attack. | [secure_memcmp](secure_memcmp/) | [VRASED+](https://github.com/sprout-uci/vrased-plus/issues/1), [TRAIN](https://github.com/sprout-uci/TRAIN/issues/1), [ACFA](https://github.com/RIT-CHAOS-SEC/ACFA/issues/1), [RATA](https://github.com/sprout-uci/RATA/issues/1), and [SpecCFA](https://github.com/RIT-CHAOS-SEC/SpecCFA/issues/1) |
 
 
 ### Compiler Analysis (Section §3.2)
@@ -36,7 +36,7 @@ Artifacts and repositories relevant to the findings in the paper can be found he
 
 ### Hardware Mitigation (Section §4.3)
 
-Two patches for the vulnerable Sancus core are provided in the [mitigations](mitigations/) folder. Changes are in comparison to the latest [commit](https://github.com/sancus-tee/sancus-core/blob/d83a5207dc5b079847dba39ac17e98fcb4bc088f). See section 4.3 in the paper for a full overview of the comparison and figure 2 and 3 for a graphical representation.
+Two patches for the vulnerable Sancus core are provided in the [mitigations](mitigations/) folder. Changes are in comparison to the latest [commit](https://github.com/sancus-tee/sancus-core/blob/d83a5207dc5b079847dba39ac17e98fcb4bc088f). For the extra register patch we also refer you to our [pull request](https://github.com/sancus-tee/sancus-core/pull/33). See section 4.3 in the paper for a full overview of the comparison and figure 2 and 3 for a graphical representation.
 
 
 ## Building and Running
