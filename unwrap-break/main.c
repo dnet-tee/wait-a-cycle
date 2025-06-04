@@ -27,6 +27,7 @@ void SM_ENTRY(hello) hello_wrap(tsc_t* data, nonce_t ad, CipherData* cipher)
                        &cipher->cipher, &cipher->tag);
 }
 
+// Function using the unwrap primitive to verify and decrypt some data received from a third party.
 int SM_ENTRY(hello) super_secure_ecall(nonce_t ad, CipherData* cipher)
 {
     tsc_t cmd;
@@ -79,7 +80,8 @@ int main()
     }
     dump_buf((uint8_t*)cipher.cipher, SANCUS_KEY_SIZE, "  Copy correct cipher");
 
-
+    // Loop that will show the timing difference of the unwrap primitive.
+    // Words of the tag are made correct one by one.
     for( int i = 0; i < SANCUS_TAG_SIZE/2; i++ ){
         cipher.tag[2*i] = correct_tag[2*i];
         cipher.tag[2*i+1] = correct_tag[2*i+1];
@@ -89,28 +91,9 @@ int main()
         tsc2 = timer_tsc_end();
         printf("Time to verify if only %d/%d words correct: %u, tsc overhead: %u\n", i+1, SANCUS_TAG_SIZE/2, tsc2, tsc1);
     }
-    // ======== WITHOUT INFO ==========
 
-    // CipherData cipher_guess = { .cipher = "\x78\x56\x78\x56\x78\x56\x78\x56",
-    //                     .tag = "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" };
-
-    // for( int i = 0; i < 256; i++ ){
-    //     cipher_guess.tag[0] = i;
-    //     for( int j = 0; j < 256; j++ ){
-    //         cipher_guess.tag[1] = j;
-            
-    //         timer_tsc_start();
-    //         super_secure_ecall(no, &cipher_guess);
-    //         tsc2 = timer_tsc_end();
-    //         if( tsc2 > 2553 ){
-    //             dump_buf((uint8_t*)cipher_guess.tag, 16, "  Guessed tag");
-    //             pr_info1("Time to verify guess: %u\n", tsc2);
-    //         }
-    //     }
-    //     pr_info1("Finished %d/255\n", i);
-    // }
-
-    // exit_success();
+    // For an end-to-end attack, we refer to the auth-ex-break example.
+    exit_success();
 }
 
 void exit_success(void)

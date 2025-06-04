@@ -2,6 +2,7 @@
 #include <sancus_support/timer.h>
 #include <stdint.h>
 
+// Custom comparison function used in VRASED and derivates.
 int secure_memcmp(const uint8_t *s1, const uint8_t *s2, int size)
 {
   int res = 0;
@@ -40,6 +41,7 @@ int main()
     tsc2 = timer_tsc_end();
     pr_info3("comparison (%d/5 bytes correct) with result: %d, took %d cycles\n", 0, res, tsc2-tsc1);
 
+    // Loop over every byte and guess the value. Based on the timing of the comparison, we can infer how many bytes were correct.
     for ( int i = 0; i < 5; i++ )
     {
         for ( uint8_t j = 0; j < 255; j++ )
